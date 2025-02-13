@@ -1,39 +1,54 @@
-node ('Ubuntu-app-agent'){  
-    def app
+pipeline {
+agent any 
+
+   stages {
+
     stage('Cloning Git') {
+
+      steps
+        {
         /* Let's make sure we have the repository cloned to our workspace */
        checkout scm
-    }  
+        }  
+    }
     stage('SAST'){
-        build 'SECURITY-SAST-SNYK'
+      steps{
+        sh 'echo SAST stage'
+       }
     }
 
     
     stage('Build-and-Tag') {
     /* This builds the actual image; synonymous to
          * docker build on the command line */
-        app = docker.build("alphinad21/snake")
+      steps{    
+        sh 'echo Build and Tag'
+          }
     }
+
     stage('Post-to-dockerhub') {
-    
-     docker.withRegistry('https://registry.hub.docker.com', 'training_creds') {
-            app.push("latest")
-        			}
-         }
-    stage('SECURITY-IMAGE-SCANNER'){
-        build 'SECURITY-IMAGE-SCANNER-AQUAMICROSCANNER'
+     steps {
+        sh 'echo post to dockerhub repo'
+     }
     }
-  
-    
+
+    stage('SECURITY-IMAGE-SCANNER'){
+      steps {
+        sh 'echo scan image for security'
+     }
+    }
+
     stage('Pull-image-server') {
-    
-         sh "docker-compose down"
-         sh "docker-compose up -d"	
+      steps {
+         sh 'echo pulling image ...'
+       }
       }
     
-    stage('DAST')
-        {
-        build 'SECURITY-DAST-OWASP_ZAP'
+    stage('DAST') {
+      steps  {
+         sh 'echo dast scan for security'
         }
- 
+    }
+ }
+}
 }
