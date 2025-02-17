@@ -3,7 +3,13 @@ node ('Ubuntu'){
     stage('Cloning Git') {
         /* Let's make sure we have the repository cloned to our workspace */
        checkout scm
-    }  
+    }
+    stage('SAST') {
+        build 'SCA-SAST-SNYK'
+    }
+    stage('SAST2'){
+        build 'SCA-SAST-SONARQUBE'
+    }
     
     stage('Build-and-Tag') {
     /* This builds the actual image; synonymous to
@@ -23,6 +29,9 @@ node ('Ubuntu'){
          sh "docker-compose down"
          sh "docker-compose up -d"	
       }
+    stage('DAST') {
+        build 'SECURITY-DAST-Arachni'
+    }
  
 }
 
